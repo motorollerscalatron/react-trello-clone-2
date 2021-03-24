@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.task {
+  background-color: white;
+  @apply flex items-center flex-wrap shadow mb-2 py-2 px-2 rounded no-underline;
+}

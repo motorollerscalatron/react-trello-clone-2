@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.column {
+  background-color: rgb(218, 225, 231);
+  @apply p-2 mr-4 text-left shadow rounded;
+  min-width: 350px;
+}
