@@ -164,14 +164,86 @@ const BoardContextProvider = (props) => {
     [board]
   );
 
-  const updateTask = useCallback(({ task, key, value }: IUpdateTask) => {}, []);
+  /*
+    const board = {
+      1: {
+        1: task,
+        2: task
+      },
+      2: {
+        3: task,
+        4: task
+      }
+    }
+
+    const tasksColumnIds = {
+      1: 1,
+      2: 1,
+      3: 2,
+      4: 2
+    }
+
+    const columnId = tasksColumnIds[taskId]
+
+    const newBoard = {
+      ...board,
+      [columnId]: {
+        ...board[columnId],
+        [taskId]: {
+          ...board[columnId][taskId],
+          [key]: value
+        }
+      }
+    }
+
+    board[columnId][taskId][key] = value
+
+  */
+
+  const updateTask = useCallback(
+    ({ task, key, value }: IUpdateTask) => {
+      const newBoard: IBoardData = {
+        ...board,
+        // Loop through columns to find the one we want to edit a task to
+        columns: board.columns.map((column) => {
+          return {
+            ...column,
+            tasks: column.tasks.map((_task) => {
+              console.log('check', { _task, task });
+              if (_task.id === task.id) {
+                return {
+                  ...task,
+                  [key]: value,
+                };
+              }
+
+              return _task;
+            }),
+          };
+          // If it's not the column we want to add the task to, just return the column
+          // as it is
+        }),
+      };
+      setBoard(newBoard);
+    },
+    [board]
+  );
   const moveTask = useCallback(
     ({ fromTasks, toTasks, fromTaskIndex, toTaskIndex }: IMoveTask) => {},
     []
   );
   const moveColumn = useCallback(
-    ({ fromColumnIndex, toColumnIndex }: IMoveColumn) => {},
-    []
+    ({ fromColumnIndex, toColumnIndex }: IMoveColumn) => {
+      // Move the column object from one index to another
+      /*
+        - Find the column object
+        - Store the column object in a temporary variables
+        - Create a new array without that column object. You can use the filter method to get a new array without the column object
+        - Place the column object in the array at new position (toColumnIndex)
+        - Update the board state
+      */
+    },
+    [board]
   );
 
   const boardContextValue: IBoardContext = useMemo(() => {
