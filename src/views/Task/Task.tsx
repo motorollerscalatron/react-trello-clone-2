@@ -36,7 +36,7 @@ const Task = (props: RouteComponentProps) => {
   useEffect(() => {
     console.log('useEffect');
     setTask(getTask(id));
-  }, [id]);
+  }, [id, getTask]);
 
   console.log({ task });
 

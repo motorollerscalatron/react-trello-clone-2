@@ -21,7 +21,7 @@ const BoardColumn = (props: IBoardColumnProps) => {
   const [taskName, setTaskName] = useState('');
   const {
     createTask,
-    moveTask,
+    //    moveTask,
     moveColumn,
   } = useBoardActionsContext() as IBoardActionsContext;
 

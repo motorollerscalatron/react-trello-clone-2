@@ -243,7 +243,9 @@ const BoardContextProvider = (props) => {
         - Update the board state
       */
     },
-    [board]
+    []
+    //comment for deploy
+    //[board]
   );
 
   const boardContextValue: IBoardContext = useMemo(() => {
