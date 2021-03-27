@@ -1,9 +1,12 @@
 //interface IBoardColumn {}
-import { useState } from "react";
-import { IBoardData, IBoardColumn } from "../../default-board";
-import ColumnTask from "../ColumnTask/ColumnTask";
-import { useBoardActionsContext } from "../../context/BoardContext";
-import "./BoardColumn.css";
+import { useState } from 'react';
+import { IBoardData, IBoardColumn } from '../../default-board';
+import ColumnTask from '../ColumnTask/ColumnTask';
+import {
+  useBoardActionsContext,
+  IBoardActionsContext,
+} from '../../context/BoardContext';
+import './BoardColumn.css';
 
 interface IBoardColumnProps {
   column: IBoardColumn;
@@ -13,16 +16,16 @@ interface IBoardColumnProps {
 
 const BoardColumn = (props: IBoardColumnProps) => {
   const { column, columnIndex, board } = props;
-  const [taskName, setTaskName] = useState("");
-  const { createTask } = useBoardActionsContext();
+  const [taskName, setTaskName] = useState('');
+  const { createTask } = useBoardActionsContext() as IBoardActionsContext;
 
   const onKeyUp = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       createTask({
         columnIndex,
         name: taskName,
       });
-      setTaskName("");
+      setTaskName('');
     }
   };
 

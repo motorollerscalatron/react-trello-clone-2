@@ -4,20 +4,16 @@ import {
   useContext,
   useMemo,
   useCallback,
-} from "react";
+} from 'react';
 import defaultBoard, {
   IBoardData,
   IBoardColumn,
   ITask,
-} from "../default-board";
-import { uuid } from "../utils";
+} from '../default-board';
+import { uuid } from '../utils';
 
 interface IBoardContext {
   board: IBoardData;
-}
-
-interface IGetTask {
-  (id: string): ITask;
 }
 
 interface ICreateColumn {
@@ -34,41 +30,73 @@ interface IUpdateTask {
   key: string;
   value: string;
 }
+
 interface IMoveTask {
   fromTasks: ITask[];
   toTasks: ITask[];
   fromTaskIndex: number;
   toTaskIndex: number;
 }
+
 interface IMoveColumn {
   fromColumnIndex: number;
   toColumnIndex: number;
 }
 
-type GetTask = (id: string) => ITask;
-type CreateColumn = ({ name: string }) => void;
-type CreateTask = ({ columnIndex: number, name: string }) => void;
+type GetTask = (id: string) => ITask | null;
+type CreateColumn = (params: { name: string }) => void;
+type CreateTask = (params: { columnIndex: number; name: string }) => void;
+type UpdateTask = (params: { task: ITask; key: string; value: string }) => void;
+type MoveTask = (params: IMoveTask) => void;
+type MoveColumn = (params: IMoveColumn) => void;
 
-interface IBoardActionsContext {
+export interface IBoardActionsContext {
   getTask: GetTask;
   createTask: CreateTask;
   createColumn: CreateColumn;
-  updateTask: IUpdateTask;
-  moveTask: IMoveTask;
-  moveColumn: IMoveColumn;
+  updateTask: UpdateTask;
+  moveTask: MoveTask;
+  moveColumn: MoveColumn;
 }
 
-const BoardContext = createContext<IBoardContext | null>(null);
-const BoardActionsContext = createContext<IBoardActionsContext | null>(null);
+function createCtx<A extends {} | null>() {
+  const ctx = createContext<A | undefined>(undefined);
+  function useCtx() {
+    const c = useContext(ctx);
+    if (c === undefined)
+      throw new Error(`useCtx must be inside a Provider with a value`);
+    return c;
+  }
 
-export const useBoardContext = (): IBoardContext => useContext(BoardContext);
-export const useBoardActionsContext = (): IBoardActionsContext =>
-  useContext(BoardActionsContext);
+  return [useCtx, ctx] as const;
+}
 
-const boardDataFromStore = localStorage.getItem("board");
+const [useBoardContext, BoardContext] = createCtx<IBoardContext>();
+const [
+  useBoardActionsContext,
+  BoardActionsContext,
+] = createCtx<IBoardActionsContext>();
+
+// const BoardContext = createContext<IBoardContext | null>(null);
+//const BoardContext = createContext<IBoardContext | null>(null);
+// const BoardActionsContext = createContext<IBoardActionsContext>(null);
+
+export { useBoardContext, useBoardActionsContext };
+
+console.log(BoardContext);
+
+const boardDataFromStore = localStorage.getItem('board');
 const boardData: IBoardData = boardDataFromStore
   ? JSON.parse(boardDataFromStore)
   : defaultBoard;
+
+// export const useBoardContext = () => useContext(BoardContext);
+// export const useBoardActionsContext = () => useContext(BoardActionsContext);
+
+// const boardDataFromStore = localStorage.getItem('board');
+// const boardData: IBoardData = boardDataFromStore
+//   ? JSON.parse(boardDataFromStore)
+//   : defaultBoard;
 
 /* came from store.js in vue project */
 
@@ -78,8 +106,8 @@ const BoardContextProvider = (props) => {
 
   //use useCallback for the sake of referential integrity
   const getTask: GetTask = useCallback(
-    (id: IGetTask) => {
-      console.log("in get task", id, board.columns);
+    (id) => {
+      console.log('in get task', id, board.columns);
       for (const column of board.columns) {
         for (const task of column.tasks) {
           if (task.id === id) {
@@ -87,6 +115,7 @@ const BoardContextProvider = (props) => {
           }
         }
       }
+      return null;
     },
     [board]
   );
@@ -108,7 +137,8 @@ const BoardContextProvider = (props) => {
               {
                 name,
                 id: uuid(),
-                description: "",
+                description: '',
+                userAssigned: null,
               },
             ],
           };
@@ -125,7 +155,7 @@ const BoardContextProvider = (props) => {
         name,
         tasks: [],
       };
-      const newBoard: IBoardColumn = {
+      const newBoard: IBoardData = {
         ...board,
         columns: [...board.columns, newBoardColumn], // used to be "push" in vue
       };

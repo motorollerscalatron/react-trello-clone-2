@@ -1,22 +1,26 @@
-import { useState, useEffect } from "react";
-import { RouteComponentProps, useParams } from "react-router-dom";
-import { useBoardActionsContext } from "../../context/BoardContext";
-import { ITask } from "../../default-board";
-import "./Task.css";
+import { useState, useEffect } from 'react';
+import { RouteComponentProps, useParams } from 'react-router-dom';
+import { useBoardActionsContext } from '../../context/BoardContext';
+import { ITask } from '../../default-board';
+import './Task.css';
+
+interface ParamTypes {
+  id: string;
+}
 
 const Task = (props: RouteComponentProps) => {
-  const [task, setTask] = useState<ITask>(null);
-  const { id } = useParams();
+  const [task, setTask] = useState<ITask | null>(null);
+  const { id } = useParams<ParamTypes>();
   const { getTask, updateTask } = useBoardActionsContext();
-  console.log("in task", props, id, getTask(id));
+  console.log('in task', props, id, getTask(id));
 
   const setTaskName = (task: ITask, taskName: string) => {
-    console.log("setTaskName");
+    console.log('setTaskName');
     // updateTask(task, 'name', taskName);
   };
 
   useEffect(() => {
-    console.log("useEffect");
+    console.log('useEffect');
     setTask(getTask(id));
   }, [id]);
 
