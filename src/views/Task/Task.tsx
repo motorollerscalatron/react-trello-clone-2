@@ -11,18 +11,19 @@ interface ParamTypes {
 const Task = (props: RouteComponentProps) => {
   const [task, setTask] = useState<ITask | null>(null);
   const { id } = useParams<ParamTypes>();
+  /* eslint-disable-next-line */
   const { getTask, updateTask } = useBoardActionsContext();
   console.log('in task', props, id, getTask(id));
 
   const setTaskName = (task: ITask, taskName: string) => {
     console.log('setTaskName');
-    // updateTask(task, 'name', taskName);
+    updateTask({ task: task, key: 'name', value: taskName });
   };
 
   useEffect(() => {
     console.log('useEffect');
     setTask(getTask(id));
-  }, [id]);
+  }, [id, getTask]);
 
   return (
     <div className="task-view">
