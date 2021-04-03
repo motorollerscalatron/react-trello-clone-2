@@ -1,19 +1,55 @@
-import { Link } from "react-router-dom";
-import "./ColumnTask.css";
+import { Link } from 'react-router-dom';
+import AppDrag from '../AppDrag/AppDrag';
+import AppDrop from '../AppDrop/AppDrop';
+import { ITask, IBoardColumn, IBoardData } from '../../default-board';
+import { TransferData } from '../BoardColumn/BoardColumn';
+import './ColumnTask.css';
 
-const ColumnTask = (props) => {
-  const { task } = props;
+interface IColumnTask {
+  task: ITask;
+  taskIndex: number;
+  column: IBoardColumn;
+  columnIndex: number;
+  board: IBoardData;
+  moveTaskOrColumn: (
+    transferData: TransferData,
+    moveTaskParams: {
+      toColumnIndex: number;
+      toTaskIndex: number;
+    }
+  ) => void;
+}
+
+const ColumnTask = (props: IColumnTask) => {
+  const { task, taskIndex, columnIndex, moveTaskOrColumn } = props;
   return (
-    <Link to={`/task/${task.id}`}>
-      <div className="task">
-        <span className="w-full flex-no-shrink font-bold">{task.name}</span>
-        {task.description ? (
-          <p className="w-full flex-no-shrink mt-1 text-sm">
-            {task.description}
-          </p>
-        ) : null}
-      </div>
-    </Link>
+    <AppDrop
+      onDrop={(transferData: TransferData) =>
+        moveTaskOrColumn(transferData, {
+          toTaskIndex: taskIndex,
+          toColumnIndex: columnIndex,
+        })
+      }
+    >
+      <AppDrag
+        transferData={{
+          type: 'task',
+          fromColumnIndex: columnIndex,
+          fromTaskIndex: taskIndex,
+        }}
+      >
+        <Link to={`/task/${task.id}`}>
+          <div className="task">
+            <span className="w-full flex-no-shrink font-bold">{task.name}</span>
+            {task.description ? (
+              <p className="w-full flex-no-shrink mt-1 text-sm">
+                {task.description}
+              </p>
+            ) : null}
+          </div>
+        </Link>
+      </AppDrag>
+    </AppDrop>
   );
 
   /*

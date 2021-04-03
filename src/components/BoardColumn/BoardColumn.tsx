@@ -16,12 +16,23 @@ interface IBoardColumnProps {
   board: IBoardData;
 }
 
+export type TransferData = {
+  fromColumnIndex: number;
+  fromTaskIndex?: number;
+  type: 'task' | 'column';
+};
+
+type MoveTaskParams = {
+  toTaskIndex: number;
+  toColumnIndex: number;
+};
+
 const BoardColumn = (props: IBoardColumnProps) => {
   const { column, columnIndex, board } = props;
   const [taskName, setTaskName] = useState('');
   const {
     createTask,
-    //    moveTask,
+    moveTask,
     moveColumn,
   } = useBoardActionsContext() as IBoardActionsContext;
 
@@ -35,14 +46,19 @@ const BoardColumn = (props: IBoardColumnProps) => {
     }
   };
 
-  type TransferData = {
-    fromColumnIndex: number;
-    type: 'task' | 'column';
-  };
-
-  const moveTaskOrColumn = (transferData: TransferData) => {
-    if (transferData.type === 'task') {
-      // moveTask();
+  const moveTaskOrColumn = (
+    transferData: TransferData,
+    moveTaskParams: MoveTaskParams
+  ) => {
+    const { fromColumnIndex, fromTaskIndex } = transferData;
+    if (transferData.type === 'task' && typeof fromTaskIndex !== 'undefined') {
+      const { toColumnIndex, toTaskIndex } = moveTaskParams;
+      moveTask({
+        fromColumnIndex,
+        fromTaskIndex,
+        toColumnIndex,
+        toTaskIndex,
+      });
     } else {
       moveColumn({
         fromColumnIndex: transferData.fromColumnIndex,
@@ -71,6 +87,7 @@ const BoardColumn = (props: IBoardColumnProps) => {
                   column={column}
                   columnIndex={columnIndex}
                   board={board}
+                  moveTaskOrColumn={moveTaskOrColumn}
                 />
               );
             })}

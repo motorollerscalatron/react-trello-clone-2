@@ -32,8 +32,8 @@ interface IUpdateTask {
 }
 
 interface IMoveTask {
-  fromTasks: ITask[];
-  toTasks: ITask[];
+  fromColumnIndex: number;
+  toColumnIndex: number;
   fromTaskIndex: number;
   toTaskIndex: number;
 }
@@ -229,8 +229,27 @@ const BoardContextProvider = (props) => {
     [board]
   );
   const moveTask = useCallback(
-    ({ fromTasks, toTasks, fromTaskIndex, toTaskIndex }: IMoveTask) => {},
-    []
+    ({
+      fromColumnIndex,
+      toColumnIndex,
+      fromTaskIndex,
+      toTaskIndex,
+    }: IMoveTask) => {
+      const columnList = JSON.parse(JSON.stringify(board.columns));
+      // const column = columnList.find((_, _columnIndex) => _columnIndex === fromColumnIndex)
+      //  const column = columnList[columnList];
+      // const task = column.tasks.find((_, _taskIndex) => _taskIndex === fromTaskIndex)
+      const task = columnList[fromColumnIndex].tasks.splice(
+        fromTaskIndex,
+        1
+      )[0];
+      columnList[toColumnIndex].tasks.splice(toTaskIndex, 0, task);
+      setBoard({
+        ...board,
+        columns: columnList,
+      });
+    },
+    [board]
   );
   const moveColumn = useCallback(
     ({ fromColumnIndex, toColumnIndex }: IMoveColumn) => {
@@ -242,8 +261,15 @@ const BoardContextProvider = (props) => {
         - Place the column object in the array at new position (toColumnIndex)
         - Update the board state
       */
+      const columnList = [...board.columns];
+      const columnToMove = columnList.splice(fromColumnIndex, 1)[0];
+      columnList.splice(toColumnIndex, 0, columnToMove);
+      setBoard({
+        ...board,
+        columns: columnList,
+      });
     },
-    []
+    [board]
     //comment for deploy
     //[board]
   );

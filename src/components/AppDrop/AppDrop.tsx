@@ -2,7 +2,10 @@ import { DragEvent, ReactNode } from 'react';
 
 interface IProps {
   children: ReactNode;
-  onDrop: (transferData: { type: 'column'; fromColumnIndex: number }) => void;
+  onDrop: (
+    transferData: { type: 'column'; fromColumnIndex: number },
+    taskParams?
+  ) => void;
 }
 
 const AppDrop = (props: IProps) => {
