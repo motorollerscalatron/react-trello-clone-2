@@ -48,8 +48,15 @@ const BoardColumn = (props: IBoardColumnProps) => {
 
   const moveTaskOrColumn = (
     transferData: TransferData,
-    moveTaskParams: MoveTaskParams
+    moveTaskParams: MoveTaskParams = {
+      toColumnIndex: columnIndex,
+      toTaskIndex: 0,
+    }
   ) => {
+    console.log({
+      moveTaskParams,
+      transferData,
+    });
     const { fromColumnIndex, fromTaskIndex } = transferData;
     if (transferData.type === 'task' && typeof fromTaskIndex !== 'undefined') {
       const { toColumnIndex, toTaskIndex } = moveTaskParams;
@@ -68,7 +75,12 @@ const BoardColumn = (props: IBoardColumnProps) => {
   };
 
   return (
-    <AppDrop onDrop={moveTaskOrColumn}>
+    <AppDrop
+      onDrop={(...args) => {
+        console.log('moveTaskOrColumn from BoardColumn App Drop', ...args);
+        moveTaskOrColumn(...args);
+      }}
+    >
       <AppDrag
         transferData={{
           type: 'column',

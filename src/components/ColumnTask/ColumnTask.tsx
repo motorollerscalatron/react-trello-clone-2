@@ -24,12 +24,16 @@ const ColumnTask = (props: IColumnTask) => {
   const { task, taskIndex, columnIndex, moveTaskOrColumn } = props;
   return (
     <AppDrop
-      onDrop={(transferData: TransferData) =>
+      onDrop={(transferData: TransferData) => {
+        console.log('on drop in column task', {
+          toTaskIndex: taskIndex,
+          toColumnIndex: columnIndex,
+        });
         moveTaskOrColumn(transferData, {
           toTaskIndex: taskIndex,
           toColumnIndex: columnIndex,
-        })
-      }
+        });
+      }}
     >
       <AppDrag
         transferData={{
