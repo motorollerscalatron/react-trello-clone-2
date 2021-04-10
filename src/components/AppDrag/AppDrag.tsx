@@ -15,6 +15,7 @@ const AppDrag = (props: IProps) => {
   const onDrag = (e: DragEvent<HTMLDivElement>) => {
     console.log({ dragRef, target: e.target, e });
     if (dragRef.current !== e.target) return;
+    console.log('allow', e);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.dropEffect = 'move';
     e.dataTransfer.setData('payload', JSON.stringify(transferData));

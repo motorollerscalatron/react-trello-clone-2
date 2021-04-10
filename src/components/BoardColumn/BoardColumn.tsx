@@ -9,6 +9,7 @@ import {
 import AppDrag from '../AppDrag/AppDrag';
 import AppDrop from '../AppDrop/AppDrop';
 import './BoardColumn.css';
+import { FaTrashAlt } from 'react-icons/fa';
 
 interface IBoardColumnProps {
   column: IBoardColumn;
@@ -34,6 +35,7 @@ const BoardColumn = (props: IBoardColumnProps) => {
     createTask,
     moveTask,
     moveColumn,
+    deleteColumn,
   } = useBoardActionsContext() as IBoardActionsContext;
 
   const onKeyUp = (e) => {
@@ -53,7 +55,7 @@ const BoardColumn = (props: IBoardColumnProps) => {
       toTaskIndex: 0,
     }
   ) => {
-    console.log({
+    console.log('move task or column', {
       moveTaskParams,
       transferData,
     });
@@ -74,6 +76,20 @@ const BoardColumn = (props: IBoardColumnProps) => {
     }
   };
 
+  const onDeleteColumn = () => {
+    const response = window.confirm(
+      'Are you sure you want to delete this column?'
+    );
+
+    if (response) {
+      deleteColumn(columnIndex);
+      // delete column
+      console.log('delete column', columnIndex);
+    } else {
+      console.log("don't delete", columnIndex);
+    }
+  };
+
   return (
     <AppDrop
       onDrop={(...args) => {
@@ -88,7 +104,12 @@ const BoardColumn = (props: IBoardColumnProps) => {
         }}
       >
         <div className="column">
-          <div className="flex items-center mb-2 font-bold">{column.name}</div>
+          <div className="flex items-center justify-between mb-2 ">
+            <div className="font-bold">{column.name}</div>
+            <div>
+              <FaTrashAlt onClick={onDeleteColumn} />
+            </div>
+          </div>
           <div className="list-reset">
             {column.tasks.map((task, index) => {
               return (

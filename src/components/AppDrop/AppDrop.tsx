@@ -11,6 +11,7 @@ interface IProps {
 const AppDrop = (props: IProps) => {
   const { children, onDrop } = props;
   const onDropHandler = (e: DragEvent<HTMLDivElement>) => {
+    console.log('on drop');
     e.stopPropagation();
     const transferData = JSON.parse(e.dataTransfer.getData('payload'));
     onDrop(transferData);
