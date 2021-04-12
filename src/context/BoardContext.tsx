@@ -32,8 +32,8 @@ interface IUpdateTask {
 }
 
 interface IMoveTask {
-  fromTasks: ITask[];
-  toTasks: ITask[];
+  fromColumnIndex: number;
+  toColumnIndex: number;
   fromTaskIndex: number;
   toTaskIndex: number;
 }
@@ -49,6 +49,8 @@ type CreateTask = (params: { columnIndex: number; name: string }) => void;
 type UpdateTask = (params: { task: ITask; key: string; value: string }) => void;
 type MoveTask = (params: IMoveTask) => void;
 type MoveColumn = (params: IMoveColumn) => void;
+type DeleteColumn = (columnIndex: number) => void;
+type DeleteTask = (taskId: string) => void;
 
 export interface IBoardActionsContext {
   getTask: GetTask;
@@ -57,6 +59,8 @@ export interface IBoardActionsContext {
   updateTask: UpdateTask;
   moveTask: MoveTask;
   moveColumn: MoveColumn;
+  deleteColumn: DeleteColumn;
+  deleteTask: DeleteTask;
 }
 
 function createCtx<A extends {} | null>() {
@@ -164,42 +168,6 @@ const BoardContextProvider = (props) => {
     [board]
   );
 
-  /*
-    const board = {
-      1: {
-        1: task,
-        2: task
-      },
-      2: {
-        3: task,
-        4: task
-      }
-    }
-
-    const tasksColumnIds = {
-      1: 1,
-      2: 1,
-      3: 2,
-      4: 2
-    }
-
-    const columnId = tasksColumnIds[taskId]
-
-    const newBoard = {
-      ...board,
-      [columnId]: {
-        ...board[columnId],
-        [taskId]: {
-          ...board[columnId][taskId],
-          [key]: value
-        }
-      }
-    }
-
-    board[columnId][taskId][key] = value
-
-  */
-
   const updateTask = useCallback(
     ({ task, key, value }: IUpdateTask) => {
       const newBoard: IBoardData = {
@@ -229,8 +197,27 @@ const BoardContextProvider = (props) => {
     [board]
   );
   const moveTask = useCallback(
-    ({ fromTasks, toTasks, fromTaskIndex, toTaskIndex }: IMoveTask) => {},
-    []
+    ({
+      fromColumnIndex,
+      toColumnIndex,
+      fromTaskIndex,
+      toTaskIndex,
+    }: IMoveTask) => {
+      const columnList = JSON.parse(JSON.stringify(board.columns));
+      // const column = columnList.find((_, _columnIndex) => _columnIndex === fromColumnIndex)
+      //  const column = columnList[columnList];
+      // const task = column.tasks.find((_, _taskIndex) => _taskIndex === fromTaskIndex)
+      const task = columnList[fromColumnIndex].tasks.splice(
+        fromTaskIndex,
+        1
+      )[0];
+      columnList[toColumnIndex].tasks.splice(toTaskIndex, 0, task);
+      setBoard({
+        ...board,
+        columns: columnList,
+      });
+    },
+    [board]
   );
   const moveColumn = useCallback(
     ({ fromColumnIndex, toColumnIndex }: IMoveColumn) => {
@@ -242,10 +229,48 @@ const BoardContextProvider = (props) => {
         - Place the column object in the array at new position (toColumnIndex)
         - Update the board state
       */
+      const columnList = [...board.columns];
+      const columnToMove = columnList.splice(fromColumnIndex, 1)[0];
+      columnList.splice(toColumnIndex, 0, columnToMove);
+      setBoard({
+        ...board,
+        columns: columnList,
+      });
     },
-    []
-    //comment for deploy
-    //[board]
+    [board]
+  );
+  const deleteColumn = useCallback(
+    (columnIndex: number) => {
+      const updatedColumns = board.columns.filter(
+        (_, index) => index !== columnIndex
+      );
+      setBoard({
+        ...board,
+        columns: updatedColumns,
+      });
+    },
+    [board]
+  );
+  const deleteTask = useCallback(
+    (taskId: string) => {
+      const newBoard: IBoardData = {
+        ...board,
+        // Loop through columns to find the one we want to edit a task to
+        columns: board.columns.map((column) => {
+          return {
+            ...column,
+            tasks: column.tasks.filter((_task) => {
+              console.log('check', { _task, taskId });
+              return _task.id !== taskId;
+            }),
+          };
+          // If it's not the column we want to add the task to, just return the column
+          // as it is
+        }),
+      };
+      setBoard(newBoard);
+    },
+    [board]
   );
 
   const boardContextValue: IBoardContext = useMemo(() => {
@@ -262,8 +287,19 @@ const BoardContextProvider = (props) => {
       updateTask,
       moveTask,
       moveColumn,
+      deleteColumn,
+      deleteTask,
     };
-  }, [getTask, createTask, createColumn, updateTask, moveTask, moveColumn]);
+  }, [
+    getTask,
+    createTask,
+    createColumn,
+    updateTask,
+    moveTask,
+    moveColumn,
+    deleteColumn,
+    deleteTask,
+  ]);
 
   return (
     <BoardContext.Provider value={boardContextValue}>
