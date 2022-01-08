@@ -53,10 +53,6 @@ const Task = (props: RouteComponentProps) => {
 
     if (response) {
       deleteTask(id);
-      // delete column
-      console.log('delete task', id);
-    } else {
-      console.log("don't delete task", id);
     }
   };
 

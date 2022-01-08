@@ -81,10 +81,6 @@ const [
   BoardActionsContext,
 ] = createCtx<IBoardActionsContext>();
 
-// const BoardContext = createContext<IBoardContext | null>(null);
-//const BoardContext = createContext<IBoardContext | null>(null);
-// const BoardActionsContext = createContext<IBoardActionsContext>(null);
-
 export { useBoardContext, useBoardActionsContext };
 
 console.log(BoardContext);
@@ -94,16 +90,7 @@ const boardData: IBoardData = boardDataFromStore
   ? JSON.parse(boardDataFromStore)
   : defaultBoard;
 
-// export const useBoardContext = () => useContext(BoardContext);
-// export const useBoardActionsContext = () => useContext(BoardActionsContext);
-
-// const boardDataFromStore = localStorage.getItem('board');
-// const boardData: IBoardData = boardDataFromStore
-//   ? JSON.parse(boardDataFromStore)
-//   : defaultBoard;
-
 /* came from store.js in vue project */
-
 const BoardContextProvider = (props) => {
   const { children } = props;
   const [board, setBoard] = useState(boardData);
@@ -128,12 +115,8 @@ const BoardContextProvider = (props) => {
     ({ columnIndex, name }: ICreateTask) => {
       const newBoard: IBoardData = {
         ...board,
-        // Loop through columns to find the one we want to add a task to
         columns: board.columns.map((column, _columnIndex) => {
-          // If it's not the column we want to add the task to, just return the column
-          // as it is
           if (columnIndex !== _columnIndex) return column;
-          // We have a match
           return {
             ...column,
             tasks: [
@@ -172,7 +155,6 @@ const BoardContextProvider = (props) => {
     ({ task, key, value }: IUpdateTask) => {
       const newBoard: IBoardData = {
         ...board,
-        // Loop through columns to find the one we want to edit a task to
         columns: board.columns.map((column) => {
           return {
             ...column,
@@ -188,8 +170,6 @@ const BoardContextProvider = (props) => {
               return _task;
             }),
           };
-          // If it's not the column we want to add the task to, just return the column
-          // as it is
         }),
       };
       setBoard(newBoard);
@@ -204,9 +184,6 @@ const BoardContextProvider = (props) => {
       toTaskIndex,
     }: IMoveTask) => {
       const columnList = JSON.parse(JSON.stringify(board.columns));
-      // const column = columnList.find((_, _columnIndex) => _columnIndex === fromColumnIndex)
-      //  const column = columnList[columnList];
-      // const task = column.tasks.find((_, _taskIndex) => _taskIndex === fromTaskIndex)
       const task = columnList[fromColumnIndex].tasks.splice(
         fromTaskIndex,
         1
@@ -255,17 +232,13 @@ const BoardContextProvider = (props) => {
     (taskId: string) => {
       const newBoard: IBoardData = {
         ...board,
-        // Loop through columns to find the one we want to edit a task to
         columns: board.columns.map((column) => {
           return {
             ...column,
             tasks: column.tasks.filter((_task) => {
-              console.log('check', { _task, taskId });
               return _task.id !== taskId;
             }),
           };
-          // If it's not the column we want to add the task to, just return the column
-          // as it is
         }),
       };
       setBoard(newBoard);
